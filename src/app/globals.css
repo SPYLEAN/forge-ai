@@ -1,26 +1,163 @@
 @import "tailwindcss";
 
+/* FORGE palette, taken from the mark: bone paper, black ink, volt lime, coral spark. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f3f2ec;
+  --paper-2: #e9e8e0;
+  --card: #fbfaf6;
+  --ink: #0e0e0d;
+  --ink-2: #4a4a45;
+  --ink-3: #85847c;
+  --line: #d9d7cd;
+  --volt: #d2ff1f;
+  --volt-deep: #9bc400;
+  --spark: #ff6a4d;
+  --ok: #2f7a3a;
+  --bad: #c2341b;
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-volt: var(--volt);
+  --color-volt-deep: var(--volt-deep);
+  --color-spark: var(--spark);
+  --color-ok: var(--ok);
+  --color-bad: var(--bad);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-mono: var(--font-mono-face);
+  --font-display: var(--font-display-face);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--volt);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Live spark: the coral star pulses on whichever station is working. */
+@keyframes spark {
+  0%,
+  100% {
+    transform: scale(0.85) rotate(0deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15) rotate(45deg);
+    opacity: 1;
+  }
+}
+.spark-live {
+  animation: spark 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .spark-live {
+    animation: none;
+  }
+}
+
+/* Agent output typography */
+.prose-forge {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.prose-forge h1,
+.prose-forge h2 {
+  font-family: var(--font-display-face), sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin: 1.6em 0 0.5em;
+  letter-spacing: -0.01em;
+}
+.prose-forge h3 {
+  font-family: var(--font-mono-face), monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 1.4em 0 0.4em;
+  color: var(--ink-2);
+}
+.prose-forge > :first-child {
+  margin-top: 0;
+}
+.prose-forge p,
+.prose-forge ul,
+.prose-forge ol {
+  margin: 0.6em 0;
+}
+.prose-forge ul {
+  list-style: disc;
+  padding-left: 1.3em;
+}
+.prose-forge ol {
+  list-style: decimal;
+  padding-left: 1.4em;
+}
+.prose-forge li {
+  margin: 0.25em 0;
+}
+.prose-forge strong {
+  font-weight: 650;
+}
+.prose-forge code {
+  font-family: var(--font-mono-face), monospace;
+  font-size: 0.85em;
+  background: var(--paper-2);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.prose-forge pre {
+  background: var(--ink);
+  color: #ecebe4;
+  padding: 1rem 1.1rem;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 0.8em 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+.prose-forge pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+.prose-forge blockquote {
+  border-left: 3px solid var(--spark);
+  padding-left: 0.9em;
+  color: var(--ink-2);
+}
+.prose-forge table {
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  font-size: 0.85rem;
+  display: block;
+  overflow-x: auto;
+}
+.prose-forge th,
+.prose-forge td {
+  border: 1px solid var(--line);
+  padding: 0.35em 0.6em;
+  text-align: left;
+}
+.prose-forge a {
+  text-decoration: underline;
+  text-decoration-color: var(--volt-deep);
+  text-underline-offset: 2px;
 }
