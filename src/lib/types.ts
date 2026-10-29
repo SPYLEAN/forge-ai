@@ -66,6 +66,9 @@ export type MissionEvent =
 export type UsageInfo = {
   signedIn: boolean;
   email: string | null;
+  guest: boolean;
+  /** owner: a private username/password login. guest: one-click, no-email sessions. */
+  signInMethod: "owner" | "guest";
   localMode: boolean;
   provider: { id: string; label: string; model: string };
   liveEnabled: boolean;

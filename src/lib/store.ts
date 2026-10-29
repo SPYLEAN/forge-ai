@@ -1,9 +1,11 @@
 import "server-only";
 import { promises as fs } from "fs";
+import os from "os";
 import path from "path";
 import { randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Viewer } from "./auth";
+import { isDeployed } from "./config";
 import { AGENTS, type AgentRole, type Gates, type Lesson, type Mission, type Partner } from "./types";
 
 /**
@@ -11,7 +13,7 @@ import { AGENTS, type AgentRole, type Gates, type Lesson, type Mission, type Par
  *
  * Supabase mode runs every query through the signed-in user's session, so
  * row-level security (supabase/schema.sql) is the real boundary between users.
- * Local mode stores everything in .forge-data/db.json for development only.
+ * Without Supabase, everything is stored in .forge-data/db.json (owner login or local dev).
  */
 export interface Store {
   getPartner(): Promise<Partner | null>;
@@ -63,7 +65,12 @@ type Db = {
 };
 
 class LocalDb {
-  private file = path.join(process.cwd(), ".forge-data", "db.json");
+  // Vercel's project directory is read-only; /tmp is writable but is wiped when the
+  // instance is recycled, so data there doesn't last on a deployment.
+  private file = path.join(
+    process.env.FORGE_DATA_DIR || (isDeployed() ? path.join(os.tmpdir(), "forge-data") : path.join(process.cwd(), ".forge-data")),
+    "db.json",
+  );
   // Serialize every read-modify-write so concurrent requests can't clobber each other.
   // This is also what makes local quota claims atomic.
   private queue: Promise<unknown> = Promise.resolve();

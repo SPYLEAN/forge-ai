@@ -44,6 +44,13 @@ export const config = {
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
   },
 
+  /** Single-owner login. When set, only this account can sign in. */
+  owner: {
+    username: process.env.FORGE_LOGIN_USER ?? "",
+    password: process.env.FORGE_LOGIN_PASSWORD ?? "",
+    sessionSecret: process.env.FORGE_SESSION_SECRET ?? "",
+  },
+
   ipHashSalt: process.env.IP_HASH_SALT ?? "",
 };
 
@@ -55,6 +62,13 @@ export const isDeployed = () => Boolean(process.env.VERCEL) || process.env.FORGE
 
 /** Local file storage plus dev sign-in. Only when Supabase isn't configured and we're not deployed. */
 export const isLocalMode = () => !hasSupabase() && !isDeployed();
+
+/**
+ * Owner login replaces dev and guest sign-in, locally and on a deployment. With Supabase
+ * it maps to one Supabase account (data in Postgres); without, to a signed cookie (data in a file).
+ */
+export const hasOwnerLogin = () =>
+  Boolean(config.owner.username && config.owner.password && config.owner.sessionSecret);
 
 export const hasCloudflare = () => Boolean(config.cloudflare.accountId && config.cloudflare.apiToken);
 

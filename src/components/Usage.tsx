@@ -60,7 +60,11 @@ export function UsageStrip({ usage }: { usage: UsageInfo }) {
       <div>
         <span className="text-ink-3">Your live missions today </span>
         <span className="font-mono font-semibold">
-          {usage.signedIn ? `${usage.remaining} of ${usage.limits.user} left` : "sign in for 1/day"}
+          {usage.signedIn
+            ? `${usage.remaining} of ${usage.limits.user} left`
+            : usage.signInMethod === "owner"
+              ? "sign in to use"
+              : "get started for 1/day"}
         </span>
       </div>
       <div>

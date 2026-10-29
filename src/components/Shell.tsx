@@ -15,16 +15,25 @@ export const STATUS_LABEL: Record<Mission["status"], string> = {
 
 export function Shell({
   name,
-  email,
+  account,
   children,
 }: {
   name?: string;
-  email?: string | null;
+  /** The signed-in account, if any. Guests have no email. */
+  account?: { signedIn: boolean; email: string | null; guest: boolean } | null;
   children: React.ReactNode;
 }) {
   const [signingOut, setSigningOut] = useState(false);
 
   async function signOut() {
+    if (
+      account?.guest &&
+      !window.confirm(
+        "You're using a guest session. If you sign out, you can't get back to this partner, its lessons or your missions. Sign out anyway?",
+      )
+    ) {
+      return;
+    }
     setSigningOut(true);
     await fetch("/api/auth/signout", { method: "POST" }).catch(() => null);
     // Full reload so every client-side cache of the old session is dropped.
@@ -47,12 +56,12 @@ export function Shell({
                 </Link>
               </>
             )}
-            {email && (
+            {account?.signedIn && (
               <button
                 onClick={signOut}
                 disabled={signingOut}
                 className="px-3 py-1.5 rounded-md hover:bg-paper-2 text-ink-2"
-                title={`Signed in as ${email}`}
+                title={account.email ? `Signed in as ${account.email}` : "Guest session in this browser"}
               >
                 {signingOut ? "Signing out…" : "Sign out"}
               </button>

@@ -1,5 +1,5 @@
 import { getViewer } from "@/lib/auth";
-import { config, fullSwarmAvailable, hasCloudflare, isLocalMode } from "@/lib/config";
+import { config, fullSwarmAvailable, hasCloudflare, hasOwnerLogin, isLocalMode } from "@/lib/config";
 import { turnstileRequired } from "@/lib/turnstile";
 import { nextReset, usageCounts } from "@/lib/usage";
 import type { UsageInfo } from "@/lib/types";
@@ -17,12 +17,15 @@ export async function GET() {
   else if (turnstileRequired() && !(config.turnstile.siteKey && config.turnstile.secretKey))
     reason = "Human verification isn't configured on this deployment, so live missions are off.";
   else if (globalLeft <= 0) reason = "Today's free capacity has been used.";
-  else if (!viewer) reason = "Sign in to get one free live mission a day.";
+  else if (!viewer)
+    reason = hasOwnerLogin() ? "Sign in to run live missions." : "Click Get started for one free live mission a day.";
   else if (remaining <= 0) reason = "You've used today's free live mission.";
 
   const info: UsageInfo = {
     signedIn: Boolean(viewer),
     email: viewer?.email ?? null,
+    guest: viewer?.guest ?? false,
+    signInMethod: hasOwnerLogin() ? "owner" : "guest",
     localMode: isLocalMode(),
     provider: { id: "cloudflare", label: "Cloudflare Workers AI", model: config.cloudflare.model },
     liveEnabled: config.liveAiEnabled,

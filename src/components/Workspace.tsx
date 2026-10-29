@@ -97,7 +97,7 @@ export function Workspace() {
   }
 
   if (!usage.signedIn) return <Landing usage={usage} onSignedIn={refresh} />;
-  if (!partner) return <Onboarding email={usage.email} onSaved={refresh} />;
+  if (!partner) return <Onboarding account={usage} onSaved={refresh} />;
 
   return (
     <Main
@@ -233,7 +233,7 @@ function Main({
     !run?.running && !limit && ((tab === "compact" && usage.compact.available) || (tab === "full" && usage.full.available));
 
   return (
-    <Shell name={partner.name} email={usage.email}>
+    <Shell name={partner.name} account={usage}>
       <p className="text-sm text-ink-2 -mb-2">{FREE_NOTICE}</p>
       <UsageStrip usage={usage} />
 
@@ -316,7 +316,9 @@ function Main({
               </label>
               <p className="text-sm text-ink-2 -mt-1">
                 {tab === "compact"
-                  ? "Compact Swarm: one free model request writes all four specialist perspectives. Short answers, one mission a day."
+                  ? `Compact Swarm: one free model request writes all four specialist perspectives. Short answers, ${
+                      usage.limits.user === 1 ? "one mission a day" : `${usage.limits.user} missions a day`
+                    }.`
                   : "Full Swarm: four separate Claude calls on your own key (paid by you)."}
               </p>
               <textarea
@@ -444,6 +446,7 @@ function applyEvent(r: Run, ev: MissionEvent): Run {
 // ---------------------------------------------------------------------------
 
 function Landing({ usage, onSignedIn }: { usage: UsageInfo; onSignedIn: () => void }) {
+  const owner = usage.signInMethod === "owner";
   return (
     <Shell>
       <section className="grid lg:grid-cols-[1.2fr_1fr] gap-8 items-center">
@@ -463,11 +466,15 @@ function Landing({ usage, onSignedIn }: { usage: UsageInfo; onSignedIn: () => vo
           <div className="flex items-center gap-3">
             <Mark size={40} />
             <div>
-              <div className="font-display font-bold">One free live mission a day</div>
-              <div className="text-xs text-ink-3">Free account. No payment details, ever.</div>
+              <div className="font-display font-bold">
+                {owner ? "Sign in to your workspace" : "One free live mission a day"}
+              </div>
+              <div className="text-xs text-ink-3">
+                {owner ? "Private workspace. No payment details, ever." : "No email, no password, no payment details."}
+              </div>
             </div>
           </div>
-          <SignIn localMode={usage.localMode} onSignedIn={onSignedIn} />
+          <SignIn method={usage.signInMethod} onSignedIn={onSignedIn} />
         </div>
       </section>
       <p className="text-sm text-ink-2">{FREE_NOTICE}</p>
@@ -475,7 +482,9 @@ function Landing({ usage, onSignedIn }: { usage: UsageInfo; onSignedIn: () => vo
       <DemoPlayer
         footer={
           <Notice>
-            That was the pre-written demo. Sign in to imprint your own partner and run one live AI mission a day.
+            {owner
+              ? "That was the pre-written demo. Sign in to imprint your partner and run live AI missions."
+              : "That was the pre-written demo. Click Get started to imprint your own partner and run one live AI mission a day."}
           </Notice>
         }
       />
@@ -483,9 +492,9 @@ function Landing({ usage, onSignedIn }: { usage: UsageInfo; onSignedIn: () => vo
   );
 }
 
-function Onboarding({ email, onSaved }: { email: string | null; onSaved: () => void }) {
+function Onboarding({ account, onSaved }: { account: UsageInfo; onSaved: () => void }) {
   return (
-    <Shell email={email}>
+    <Shell account={account}>
       <div className="max-w-lg w-full mx-auto">
         <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-spark mb-2">Step 1 · Imprint</p>
         <h1 className="font-display font-extrabold text-3xl tracking-tight mb-2">Who is your partner?</h1>

@@ -35,7 +35,7 @@ const fail = (status: number, code: string, error: string, extra: object = {}) =
  */
 export async function POST(request: Request) {
   const viewer = await getViewer();
-  if (!viewer) return fail(401, "auth_required", "Sign in to run a live mission. The interactive demo needs no account.");
+  if (!viewer) return fail(401, "auth_required", "Click Get started to run a live mission. The interactive demo needs no account.");
 
   const parsed = Body.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return fail(400, "invalid", "Invalid mission request.");
